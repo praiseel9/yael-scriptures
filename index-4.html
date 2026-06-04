@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yael — The Living Word</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0a0f1e;
+      --navy-mid: #111827;
+      --navy-light: #1a2540;
+      --gold: #c9a84c;
+      --gold-light: #e4c97e;
+      --gold-dim: #8a6f32;
+      --cream: #f5efe0;
+      --cream-dim: #d9ceb5;
+      --text: #e8e0d0;
+      --text-dim: #9a9080;
+      --white: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'EB Garamond', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+
+    /* ── SPLASH / HOME ── */
+    #home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .logo-mark {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1.5rem;
+      animation: fadeDown 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .logo-mark svg { width: 100%; height: 100%; }
+
+    .site-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3.2rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      animation: fadeDown 0.9s 0.1s ease forwards;
+      opacity: 0;
+      line-height: 1;
+    }
+
+    .site-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--cream-dim);
+      letter-spacing: 0.08em;
+      margin-top: 0.5rem;
+      animation: fadeDown 1s 0.2s ease forwards;
+      opacity: 0;
+    }
+
+    .gold-rule {
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 2rem auto;
+      animation: fadeIn 1s 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    /* Daily Verse Card */
+    .daily-verse-card {
+      background: linear-gradient(135deg, var(--navy-light), rgba(201,168,76,0.08));
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 16px;
+      padding: 1.8rem 1.5rem;
+      margin: 0 0 2rem;
+      width: 100%;
+      text-align: left;
+      animation: fadeUp 1s 0.5s ease forwards;
+      opacity: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .daily-verse-card::before {
+      content: '\201C';
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 6rem;
+      color: rgba(201,168,76,0.12);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .daily-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .daily-verse-text {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--cream);
+      font-style: italic;
+      margin-bottom: 0.8rem;
+    }
+
+    .daily-verse-ref {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      color: var(--gold-light);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      color: var(--navy);
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      border-radius: 50px;
+      padding: 0.9rem 2.4rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+      animation: fadeUp 1s 0.6s ease forwards;
+      opacity: 0;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201,168,76,0.45);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── NAV BAR ── */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      background: rgba(10,15,30,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .navbar-brand {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      cursor: pointer;
+    }
+
+    .navbar-back {
+      background: none;
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.45rem 0.9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .navbar-back:hover { background: rgba(201,168,76,0.1); }
+
+    /* ── TESTAMENT SELECTOR ── */
+    .testament-tabs {
+      display: flex;
+      margin: 1.2rem 1.2rem 0;
+      background: var(--navy-light);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .testament-tab {
+      flex: 1;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.65rem;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: transparent;
+      color: var(--text-dim);
+    }
+
+    .testament-tab.active {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    /* ── BOOK LIST ── */
+    .books-section { padding: 1.2rem; }
+
+    .section-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.78rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+      padding-left: 0.2rem;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.55rem;
+    }
+
+    .book-btn {
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 10px;
+      padding: 0.75rem 0.4rem;
+      color: var(--text);
+      font-family: 'EB Garamond', serif;
+      font-size: 0.82rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      line-height: 1.3;
+    }
+
+    .book-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+      background: rgba(201,168,76,0.07);
+      transform: translateY(-1px);
+    }
+
+    .book-btn:active { transform: translateY(0); }
+
+    /* ── CHAPTER GRID ── */
+    .chapter-header {
+      padding: 1.5rem 1.2rem 0.5rem;
+      text-align: center;
+    }
+
+    .chapter-book-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+    }
+
+    .chapter-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin-top: 0.3rem;
+    }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      padding: 1rem 1.2rem 2rem;
+    }
+
+    .ch-btn {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ch-btn:hover {
+      background: rgba(201,168,76,0.12);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      transform: scale(1.05);
+    }
+
+    /* ── READER ── */
+    .reader-meta {
+      text-align: center;
+      padding: 1.5rem 1.2rem 0.8rem;
+    }
+
+    .reader-book {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+    }
+
+    .reader-chapter {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    .reader-rule {
+      width: 50px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 1rem auto;
+    }
+
+    .verses-container {
+      padding: 0 1.4rem 6rem;
+    }
+
+    .verse {
+      margin-bottom: 0.9rem;
+      display: flex;
+      gap: 0.7rem;
+      align-items: flex-start;
+      transition: background 0.2s;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+    }
+
+    .verse:hover { background: rgba(201,168,76,0.05); }
+
+    .verse-num {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      color: var(--gold);
+      font-weight: 600;
+      min-width: 1.4rem;
+      padding-top: 0.35rem;
+      letter-spacing: 0.05em;
+    }
+
+    .verse-text {
+      font-size: 1.08rem;
+      line-height: 1.78;
+      color: var(--cream);
+    }
+
+    /* ── CHAPTER NAV ── */
+    .chapter-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(to top, var(--navy) 80%, transparent);
+      gap: 1rem;
+    }
+
+    .nav-ch-btn {
+      flex: 1;
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      padding: 0.75rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .nav-ch-btn.prev {
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold);
+    }
+
+    .nav-ch-btn.next {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .nav-ch-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .nav-ch-btn:hover:not(:disabled) { opacity: 0.85; }
+
+    /* ── LOADING ── */
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      gap: 1.2rem;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 2px solid rgba(201,168,76,0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── ERROR ── */
+    .error-wrap {
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .error-msg {
+      color: #e07070;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+
+    .btn-retry {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid var(--gold);
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-retry:hover { background: rgba(201,168,76,0.1); }
+
+    /* ── FOOTER ── */
+    .credits {
+      text-align: center;
+      padding: 3rem 1.5rem 2rem;
+      animation: fadeIn 1.2s 1s ease forwards;
+      opacity: 0;
+    }
+
+    .credits-rule {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      margin: 0 auto 1.2rem;
+    }
+
+    .credits-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.4rem;
+    }
+
+    .credits-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* ── SEARCH ── */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 1.2rem 0;
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 12px;
+      padding: 0.55rem 0.9rem;
+    }
+
+    .search-bar input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      flex: 1;
+      letter-spacing: 0.03em;
+    }
+
+    .search-bar input::placeholder { color: var(--text-dim); }
+
+    .search-icon {
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+    }
+
+    /* ── SCREEN TOGGLE ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══ HOME SCREEN ══ -->
+  <div id="screen-home" class="screen active">
+    <div id="home">
+
+      <div class="logo-mark">
+        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="36" r="34" stroke="#c9a84c" stroke-width="1.2"/>
+          <path d="M36 10 L36 62M22 20 L36 36 L50 20M22 52 L36 36 L50 52" stroke="#c9a84c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="36" cy="36" r="4" fill="#c9a84c" opacity="0.7"/>
+        </svg>
+      </div>
+
+      <div class="site-title">YAEL</div>
+      <div class="site-tagline">The Living Word</div>
+      <div class="gold-rule"></div>
+
+      <div class="daily-verse-card" id="daily-card">
+        <div class="daily-label">✦ Verse of the Day</div>
+        <div class="daily-verse-text" id="daily-text">Loading today's verse…</div>
+        <div class="daily-verse-ref" id="daily-ref"></div>
+      </div>
+
+      <button class="btn-primary" onclick="goToBible()">OPEN THE BIBLE</button>
+
+      <div class="credits">
+        <div class="credits-rule"></div>
+        <div class="credits-label">crafted by</div>
+        <div class="credits-name">PRAISE EL ILEYA OPESEME</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ BOOKS SCREEN ══ -->
+  <div id="screen-books" class="screen">
+    <div class="navbar">
+      <button class="navbar-back" onclick="showScreen('home')">← Home</button>
+      <div class="navbar-brand">YAEL</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="book-search" placeholder="Search books…" oninput="filterBooks()" />
+    </div>
+
+    <div class="testament-tabs">
+      <button class="testament-tab active" id="tab-ot" onclick="switchTestament('ot')">Old Testament</button>
+      <button class="testament-tab" id="tab-nt" onclick="switchTestament('nt')">New Testament</button>
+    </div>
+
+    <div class="books-section" id="books-container"></div>
+  </div>
+
+  <!-- ══ CHAPTERS SCREEN ══ -->
+  <div id="screen-chapters" class="screen">
+    <div class="navbar">
+      <button class="navbar-back" onclick="showScreen('books')">← Books</button>
+      <div class="navbar-brand">YAEL</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="chapter-header">
+      <div class="chapter-book-name" id="ch-book-name"></div>
+      <div class="chapter-subtitle" id="ch-book-testament"></div>
+    </div>
+    <div class="chapters-grid" id="chapters-grid"></div>
+  </div>
+
+  <!-- ══ READER SCREEN ══ -->
+  <div id="screen-reader" class="screen">
+    <div class="navbar">
+      <button class="navbar-back" onclick="showScreen('chapters')">← Chapters</button>
+      <div class="navbar-brand">YAEL</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="reader-meta">
+      <div class="reader-book" id="rd-book"></div>
+      <div class="reader-chapter" id="rd-chapter"></div>
+      <div class="reader-rule"></div>
+    </div>
+    <div class="verses-container" id="verses-container">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching the Word…</div>
+      </div>
+    </div>
+    <div class="chapter-nav">
+      <button class="nav-ch-btn prev" id="btn-prev" onclick="changeChapter(-1)">← PREV</button>
+      <button class="nav-ch-btn next" id="btn-next" onclick="changeChapter(1)">NEXT →</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════
+//  BIBLE DATA
+// ══════════════════════════════════════════════
+const BIBLE = {
+  ot: [
+    {name:"Genesis",abbr:"gen",chapters:50},{name:"Exodus",abbr:"exo",chapters:40},
+    {name:"Leviticus",abbr:"lev",chapters:27},{name:"Numbers",abbr:"num",chapters:36},
+    {name:"Deuteronomy",abbr:"deu",chapters:34},{name:"Joshua",abbr:"jos",chapters:24},
+    {name:"Judges",abbr:"jdg",chapters:21},{name:"Ruth",abbr:"rut",chapters:4},
+    {name:"1 Samuel",abbr:"1sa",chapters:31},{name:"2 Samuel",abbr:"2sa",chapters:24},
+    {name:"1 Kings",abbr:"1ki",chapters:22},{name:"2 Kings",abbr:"2ki",chapters:25},
+    {name:"1 Chronicles",abbr:"1ch",chapters:29},{name:"2 Chronicles",abbr:"2ch",chapters:36},
+    {name:"Ezra",abbr:"ezr",chapters:10},{name:"Nehemiah",abbr:"neh",chapters:13},
+    {name:"Esther",abbr:"est",chapters:10},{name:"Job",abbr:"job",chapters:42},
+    {name:"Psalms",abbr:"psa",chapters:150},{name:"Proverbs",abbr:"pro",chapters:31},
+    {name:"Ecclesiastes",abbr:"ecc",chapters:12},{name:"Song of Solomon",abbr:"sng",chapters:8},
+    {name:"Isaiah",abbr:"isa",chapters:66},{name:"Jeremiah",abbr:"jer",chapters:52},
+    {name:"Lamentations",abbr:"lam",chapters:5},{name:"Ezekiel",abbr:"ezk",chapters:48},
+    {name:"Daniel",abbr:"dan",chapters:12},{name:"Hosea",abbr:"hos",chapters:14},
+    {name:"Joel",abbr:"jol",chapters:3},{name:"Amos",abbr:"amo",chapters:9},
+    {name:"Obadiah",abbr:"oba",chapters:1},{name:"Jonah",abbr:"jon",chapters:4},
+    {name:"Micah",abbr:"mic",chapters:7},{name:"Nahum",abbr:"nam",chapters:3},
+    {name:"Habakkuk",abbr:"hab",chapters:3},{name:"Zephaniah",abbr:"zep",chapters:3},
+    {name:"Haggai",abbr:"hag",chapters:2},{name:"Zechariah",abbr:"zec",chapters:14},
+    {name:"Malachi",abbr:"mal",chapters:4}
+  ],
+  nt: [
+    {name:"Matthew",abbr:"mat",chapters:28},{name:"Mark",abbr:"mrk",chapters:16},
+    {name:"Luke",abbr:"luk",chapters:24},{name:"John",abbr:"jhn",chapters:21},
+    {name:"Acts",abbr:"act",chapters:28},{name:"Romans",abbr:"rom",chapters:16},
+    {name:"1 Corinthians",abbr:"1co",chapters:16},{name:"2 Corinthians",abbr:"2co",chapters:13},
+    {name:"Galatians",abbr:"gal",chapters:6},{name:"Ephesians",abbr:"eph",chapters:6},
+    {name:"Philippians",abbr:"php",chapters:4},{name:"Colossians",abbr:"col",chapters:4},
+    {name:"1 Thessalonians",abbr:"1th",chapters:5},{name:"2 Thessalonians",abbr:"2th",chapters:3},
+    {name:"1 Timothy",abbr:"1ti",chapters:6},{name:"2 Timothy",abbr:"2ti",chapters:4},
+    {name:"Titus",abbr:"tit",chapters:3},{name:"Philemon",abbr:"phm",chapters:1},
+    {name:"Hebrews",abbr:"heb",chapters:13},{name:"James",abbr:"jas",chapters:5},
+    {name:"1 Peter",abbr:"1pe",chapters:5},{name:"2 Peter",abbr:"2pe",chapters:3},
+    {name:"1 John",abbr:"1jn",chapters:5},{name:"2 John",abbr:"2jn",chapters:1},
+    {name:"3 John",abbr:"3jn",chapters:1},{name:"Jude",abbr:"jud",chapters:1},
+    {name:"Revelation",abbr:"rev",chapters:22}
+  ]
+};
+
+const DAILY_VERSES = [
+  {ref:"John 3:16",query:"john+3:16"},
+  {ref:"Psalm 23:1",query:"psalm+23:1"},
+  {ref:"Proverbs 3:5-6",query:"proverbs+3:5-6"},
+  {ref:"Jeremiah 29:11",query:"jeremiah+29:11"},
+  {ref:"Philippians 4:13",query:"philippians+4:13"},
+  {ref:"Isaiah 40:31",query:"isaiah+40:31"},
+  {ref:"Romans 8:28",query:"romans+8:28"},
+  {ref:"Joshua 1:9",query:"joshua+1:9"},
+  {ref:"Psalm 46:1",query:"psalm+46:1"},
+  {ref:"Matthew 6:33",query:"matthew+6:33"},
+  {ref:"2 Timothy 1:7",query:"2+timothy+1:7"},
+  {ref:"Lamentations 3:22-23",query:"lamentations+3:22-23"},
+  {ref:"Ephesians 6:10",query:"ephesians+6:10"},
+  {ref:"Hebrews 11:1",query:"hebrews+11:1"},
+];
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let state = {
+  testament: 'ot',
+  book: null,
+  chapter: 1,
+  currentScreen: 'home'
+};
+
+// ══════════════════════════════════════════════
+//  SCREEN NAVIGATION
+// ══════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  state.currentScreen = name;
+  window.scrollTo(0, 0);
+}
+
+function goToBible() {
+  renderBooks();
+  showScreen('books');
+}
+
+// ══════════════════════════════════════════════
+//  BOOKS
+// ══════════════════════════════════════════════
+function switchTestament(t) {
+  state.testament = t;
+  document.getElementById('tab-ot').classList.toggle('active', t === 'ot');
+  document.getElementById('tab-nt').classList.toggle('active', t === 'nt');
+  renderBooks();
+}
+
+function renderBooks(filter = '') {
+  const books = BIBLE[state.testament].filter(b =>
+    b.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  const c = document.getElementById('books-container');
+  const label = state.testament === 'ot' ? 'Old Testament' : 'New Testament';
+  c.innerHTML = `<div class="section-heading">${label} · ${books.length} Books</div>
+    <div class="books-grid">${
+      books.map(b =>
+        `<button class="book-btn" onclick="openBook('${b.abbr}')">${b.name}</button>`
+      ).join('')
+    }</div>`;
+}
+
+function filterBooks() {
+  renderBooks(document.getElementById('book-search').value);
+}
+
+// ══════════════════════════════════════════════
+//  CHAPTERS
+// ══════════════════════════════════════════════
+function openBook(abbr) {
+  const all = [...BIBLE.ot, ...BIBLE.nt];
+  state.book = all.find(b => b.abbr === abbr);
+  state.chapter = 1;
+
+  document.getElementById('ch-book-name').textContent = state.book.name;
+  document.getElementById('ch-book-testament').textContent =
+    BIBLE.ot.find(b => b.abbr === abbr) ? 'Old Testament' : 'New Testament';
+
+  const grid = document.getElementById('chapters-grid');
+  grid.innerHTML = Array.from({length: state.book.chapters}, (_, i) =>
+    `<button class="ch-btn" onclick="openChapter(${i+1})">${i+1}</button>`
+  ).join('');
+
+  showScreen('chapters');
+}
+
+// ══════════════════════════════════════════════
+//  READER
+// ══════════════════════════════════════════════
+function openChapter(ch) {
+  state.chapter = ch;
+  document.getElementById('rd-book').textContent = state.book.name;
+  document.getElementById('rd-chapter').textContent = `Chapter ${ch}`;
+
+  document.getElementById('btn-prev').disabled = ch <= 1;
+  document.getElementById('btn-next').disabled = ch >= state.book.chapters;
+
+  showScreen('reader');
+  fetchChapter(state.book, ch);
+}
+
+async function fetchChapter(book, ch) {
+  const vc = document.getElementById('verses-container');
+  vc.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Fetching the Word…</div></div>`;
+
+  try {
+    const url = `https://bible-api.com/${encodeURIComponent(book.name)}+${ch}?translation=web`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Network error');
+    const data = await res.json();
+
+    if (!data.verses || data.verses.length === 0) throw new Error('No verses found');
+
+    vc.innerHTML = data.verses.map(v =>
+      `<div class="verse">
+        <span class="verse-num">${v.verse}</span>
+        <span class="verse-text">${v.text.trim()}</span>
+      </div>`
+    ).join('');
+
+  } catch(e) {
+    vc.innerHTML = `<div class="error-wrap">
+      <div class="error-msg">Could not load this chapter.<br>Please check your connection and try again.</div>
+      <button class="btn-retry" onclick="fetchChapter(state.book, state.chapter)">Try Again</button>
+    </div>`;
+  }
+}
+
+function changeChapter(dir) {
+  const next = state.chapter + dir;
+  if (next < 1 || next > state.book.chapters) return;
+  openChapter(next);
+}
+
+// ══════════════════════════════════════════════
+//  DAILY VERSE
+// ══════════════════════════════════════════════
+async function loadDailyVerse() {
+  const today = new Date();
+  const idx = (today.getDate() + today.getMonth()) % DAILY_VERSES.length;
+  const pick = DAILY_VERSES[idx];
+
+  try {
+    const res = await fetch(`https://bible-api.com/${pick.query}?translation=web`);
+    const data = await res.json();
+    if (data.text) {
+      document.getElementById('daily-text').textContent = data.text.trim();
+      document.getElementById('daily-ref').textContent = '— ' + pick.ref + ' (WEB)';
+    }
+  } catch(e) {
+    document.getElementById('daily-text').textContent = 'Trust in the Lord with all your heart and lean not on your own understanding.';
+    document.getElementById('daily-ref').textContent = '— Proverbs 3:5 (WEB)';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+loadDailyVerse();
+</script>
+</body>
+</html>
